@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戦闘シミュレーション</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .log {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+    <script>
+        async function fetchBattleResult() {
+            const response = await fetch('/battle');
+            const data = await response.json();
+            
+            document.getElementById('fighter1').innerText = `名前: ${data.fighter1.name}, 健康: ${data.fighter1.health}, 攻撃力: ${data.fighter1.attack_power}, 防御力: ${data.fighter1.defense}`;
+            document.getElementById('fighter2').innerText = `名前: ${data.fighter2.name}, 健康: ${data.fighter2.health}, 攻撃力: ${data.fighter2.attack_power}, 防御力: ${data.fighter2.defense}`;
+            document.getElementById('winner').innerText = `勝者: ${data.winner}`;
+            document.getElementById('battle-log').innerText = data.battle_log.join('\n');
+        }
+        
+        async function fetchTrainingStatus() {
+            const response = await fetch('/train');
+            const text = await response.text();
+            document.getElementById('training-status').innerText = text;
+        }
+        
+        async function fetchBattleHistory() {
+            const response = await fetch('/history');
+            const data = await response.json();
+            
+            const historyContainer = document.getElementById('history');
+            historyContainer.innerHTML = '';
+            data.forEach(log => {
+                const logElement = document.createElement('div');
+                logElement.className = 'log';
+                logElement.innerHTML = `
+                    <p><strong>勝者:</strong> ${log.winner_name}</p>
+                    <p><strong>戦士1:</strong> ${log.fighter1_name} (健康: ${log.fighter1_health}, 攻撃力: ${log.fighter1_attack_power}, 防御力: ${log.fighter1_defense})</p>
+                    <p><strong>戦士2:</strong> ${log.fighter2_name} (健康: ${log.fighter2_health}, 攻撃力: ${log.fighter2_attack_power}, 防御力: ${log.fighter2_defense})</p>
+                    <pre>${log.battle_log}</pre>
+                `;
+                historyContainer.appendChild(logElement);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('fetch-battle').addEventListener('click', fetchBattleResult);
+            document.getElementById('start-training').addEventListener('click', fetchTrainingStatus);
+            document.getElementById('fetch-history').addEventListener('click', fetchBattleHistory);
+        });
+    </script>
+</head>
+<body>
+    <h1>戦闘シミュレーション</h1>
+    <button id="fetch-battle">戦闘を開始</button>
+    <button id="start-training">トレーニングを開始</button>
+    <button id="fetch-history">履歴を表示</button>
+    <div id="results">
+        <p id="fighter1"></p>
+        <p id="fighter2"></p>
+        <p id="winner"></p>
+        <pre id="battle-log"></pre>
+        <div id="history"></div>
+    </div>
+</body>
+</html>
