@@ -1,30 +1,12 @@
-from combat_simulation import Combatant, battle
-from ml_agent import CombatEnv, QLearningAgent
+from combat_simulation import Combatant, battle, generate_random_combatant
 
-# 戦闘シミュレーションの例
 def run_combat_simulation():
-    fighter1 = Combatant("戦士", 100, 20)
-    fighter2 = Combatant("魔法使い", 80, 25)
+    fighter1 = generate_random_combatant()
+    fighter2 = generate_random_combatant()
+    print(f"戦士1: {fighter1.name}, 健康: {fighter1.health}, 攻撃力: {fighter1.attack_power}, 防御力: {fighter1.defense}")
+    print(f"戦士2: {fighter2.name}, 健康: {fighter2.health}, 攻撃力: {fighter2.attack_power}, 防御力: {fighter2.defense}")
     winner = battle(fighter1, fighter2)
     print(f"戦闘の勝者は{winner}です。")
 
-# 機械学習エージェントのトレーニング
-def train_ml_agent():
-    env = CombatEnv()
-    agent = QLearningAgent(action_space=2)
-    
-    for episode in range(1000):
-        state = env.reset()
-        done = False
-        while not done:
-            action = agent.choose_action(int(state[0]))
-            next_state, reward, done = env.step(action)
-            agent.update_q_table(int(state[0]), action, reward, int(next_state[0]))
-            state = next_state
-
 if __name__ == "__main__":
-    # 戦闘シミュレーションの実行
     run_combat_simulation()
-    
-    # 機械学習エージェントのトレーニング
-    train_ml_agent()
